@@ -16,22 +16,22 @@ pipeline {
     stage('Build') {
       steps {
         echo "🔨 Building Docker image..."
-        sh 'docker build -t $IMAGE_NAME .'
+        dat 'docker build -t $IMAGE_NAME .'
       }
     }
 
     stage('Install Dependencies') {
       steps {
         echo "📦 Installing project dependencies..."
-        sh 'npm install'
-        sh 'npm install --save-dev dotenv-cli'
+        dat 'npm install'
+        dat 'npm install --save-dev dotenv-cli'
       }
     }
 
     stage('Test') {
       steps {
         echo "🧪 Running tests with .env.test config..."
-        sh 'dotenv -e .env.test -- npm test'
+        dat 'dotenv -e .env.test -- npm test'
       }
     }
 
@@ -39,7 +39,7 @@ pipeline {
       steps {
         echo "📊 Running SonarQube analysis..."
         withSonarQubeEnv('My SonarQube') {
-          sh """
+          dat """
             npx sonar-scanner \
               -Dsonar.projectKey=$SONAR_PROJECT_KEY \
               -Dsonar.sources=. \
@@ -53,15 +53,15 @@ pipeline {
     stage('Security Scan (Trivy)') {
       steps {
         echo "🔒 Scanning Docker image for vulnerabilities..."
-        sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image $IMAGE_NAME || true'
+        dat 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image $IMAGE_NAME || true'
       }
     }
 
     stage('Deploy (Docker Compose)') {
       steps {
         echo "🚀 Deploying application via docker-compose..."
-        sh 'docker-compose down || true'
-        sh 'docker-compose up -d --build'
+        dat 'docker-compose down || true'
+        dat 'docker-compose up -d --build'
       }
     }
 
@@ -71,11 +71,11 @@ pipeline {
       }
       steps {
         echo "🏷️ Tagging release with Git..."
-        sh '''
+        dat '''
           git config --global user.email "jenkins@example.com"
           git config --global user.name "Jenkins CI"
           git tag v1.0.$BUILD_NUMBER
-          git push origin v1.0.$BUILD_NUMBER
+          git pudat origin v1.0.$BUILD_NUMBER
         '''
       }
     }
@@ -83,8 +83,8 @@ pipeline {
     stage('Monitoring Health Check') {
       steps {
         echo "📈 Verifying application health..."
-        sh 'sleep 10'
-        sh 'curl --fail http://localhost:3000/ping || exit 1'
+        dat 'sleep 10'
+        dat 'curl --fail http://localhost:3000/ping || exit 1'
       }
     }
   }
@@ -92,7 +92,7 @@ pipeline {
   post {
     always {
       echo "🧹 Cleaning up..."
-      sh 'docker-compose down || true'
+      dat 'docker-compose down || true'
     }
     success {
       echo "✅ Pipeline completed successfully!"
