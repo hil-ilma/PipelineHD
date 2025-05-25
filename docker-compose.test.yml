@@ -4,14 +4,16 @@ services:
   db:
     image: mysql:5.7
     container_name: test-mysql
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: companydb
-    ports:
-      - "3308:3306"
     volumes:
-      - ./db:/docker-entrypoint-initdb.d
-      - test-mysql-data:/var/lib/mysql
+      - ./db/database.sql:/docker-entrypoint-initdb.d/1_database.sql
+      - ./db/procedures.sql:/docker-entrypoint-initdb.d/2_procedures.sql
+    ports:
+      - "3307:3306" # or whatever you’re using
+
   api:
     build:
       context: .
