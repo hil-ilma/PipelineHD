@@ -12,7 +12,6 @@ services:
     volumes:
       - ./db:/docker-entrypoint-initdb.d
       - test-mysql-data:/var/lib/mysql
-    command: --init-command="SHOW DATABASES;"
   api:
     build:
       context: .
