@@ -22,4 +22,5 @@ services:
       - db
     command: ["sh", "./wait-for.sh"]
 
-
+volumes:
+  test-mysql-data:
