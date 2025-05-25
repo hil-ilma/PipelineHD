@@ -8,10 +8,9 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: companydb
     ports:
-      - "3308:3306"  # This is only for external use (Jenkins host can access)
+      - "3308:3306"  
     volumes:
       - test-mysql-data:/var/lib/mysql
-
   api:
     build:
       context: .
@@ -21,7 +20,7 @@ services:
     depends_on:
       - db
     command: >
-      sh -c "sleep 10 && npm test"
+      sh -c "until mysqladmin ping -h db -u root -proot --silent; do echo waiting for db; sleep 3; done && npm test"
 
 volumes:
   test-mysql-data:
