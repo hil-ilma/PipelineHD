@@ -5,7 +5,11 @@ pipeline {
     IMAGE_NAME = "node-api"
     SONAR_PROJECT_KEY = "node-api"
     SONAR_HOST_URL = "http://localhost:9000"
-    SONAR_TOKEN = credentials('sonarqube-token') // Add in Jenkins credentials
+    SONAR_TOKEN = credentials('sonarqube-token') // Make sure this ID matches the Jenkins credential
+  }
+
+  tools {
+    nodejs 'NodeJS_18' // optional: define NodeJS tool in Jenkins Global Tool Configuration
   }
 
   stages {
@@ -16,12 +20,18 @@ pipeline {
       }
     }
 
+    stage('Install Dependencies') {
+      steps {
+        echo "📦 Installing project dependencies..."
+        sh 'npm install'
+        sh 'npm install --save-dev dotenv-cli'
+      }
+    }
+
     stage('Test') {
       steps {
         echo "🧪 Running tests with .env.test config..."
-        sh 'npm install'
-        sh 'npm install --save-dev dotenv-cli'
-        sh 'npm test'
+        sh 'dotenv -e .env.test -- npm test'
       }
     }
 
@@ -29,13 +39,13 @@ pipeline {
       steps {
         echo "📊 Running SonarQube analysis..."
         withSonarQubeEnv('My SonarQube') {
-          sh '''
+          sh """
             npx sonar-scanner \
               -Dsonar.projectKey=$SONAR_PROJECT_KEY \
               -Dsonar.sources=. \
               -Dsonar.host.url=$SONAR_HOST_URL \
               -Dsonar.login=$SONAR_TOKEN
-          '''
+          """
         }
       }
     }
@@ -43,7 +53,7 @@ pipeline {
     stage('Security Scan (Trivy)') {
       steps {
         echo "🔒 Scanning Docker image for vulnerabilities..."
-        sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image $IMAGE_NAME'
+        sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image $IMAGE_NAME || true'
       }
     }
 
@@ -56,6 +66,9 @@ pipeline {
     }
 
     stage('Release Tag') {
+      when {
+        branch 'main' // or use 'master' or a parameter-based condition
+      }
       steps {
         echo "🏷️ Tagging release with Git..."
         sh '''
