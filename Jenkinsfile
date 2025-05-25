@@ -5,14 +5,14 @@ pipeline {
     IMAGE_NAME = "node-api"
     SONAR_PROJECT_KEY = "node-api"
     SONAR_HOST_URL = "http://localhost:9000"
-    SONAR_TOKEN = credentials('jenkins-sonar-token')
+    SONAR_TOKEN = credentials('sonarqube-token')
   }
 
   stages {
     stage('Build') {
       steps {
         echo "🔨 Building Docker image..."
-        sh 'docker build -t $IMAGE_NAME .'
+        sh 'docker build -t $IMAGE_NAME -f docker/Dockerfile .'
       }
     }
 
