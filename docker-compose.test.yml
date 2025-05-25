@@ -8,9 +8,10 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: companydb
     ports:
-      - "3308:3306"  
+      - "3308:3306"
     volumes:
       - test-mysql-data:/var/lib/mysql
+
   api:
     build:
       context: .
@@ -19,8 +20,7 @@ services:
       - .env.test
     depends_on:
       - db
-    command: >
-      sh -c "until mysqladmin ping -h db -u root -proot --silent; do echo waiting for db; sleep 3; done && npm test"
+    command: ["sh", "./wait-for.sh"]
 
 volumes:
   test-mysql-data:
