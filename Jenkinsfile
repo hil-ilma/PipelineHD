@@ -20,6 +20,7 @@ pipeline {
     steps {
       echo '🧪 Running tests with Docker Compose...'
       sh 'docker-compose -f docker-compose.test.yml down --remove-orphans || true'
+      sh 'docker rm -f test-mysql || true'
       sh 'docker-compose -f docker-compose.test.yml up --abort-on-container-exit --build --force-recreate --exit-code-from api'
     }
   }
