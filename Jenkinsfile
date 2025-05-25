@@ -2,84 +2,78 @@ pipeline {
   agent any
 
   environment {
-    IMAGE_NAME = 'node-api'
-    CONTAINER_NAME = 'node-api'
-    DB_CONTAINER = 'companydb'
-    TAG = "v1.0-${env.BUILD_NUMBER}"
+    IMAGE_NAME = "node-api"
+    SONAR_PROJECT_KEY = "node-api"
+    SONAR_HOST_URL = "http://localhost:9000"
+    SONAR_TOKEN = credentials('jenkins-sonar-token')
   }
 
   stages {
     stage('Build') {
       steps {
-        echo '🔧 Building Docker image...'
-        sh 'docker build --no-cache -t $IMAGE_NAME .'
+        echo "🔨 Building Docker image..."
+        sh 'docker build -t $IMAGE_NAME .'
       }
     }
 
     stage('Test') {
       steps {
-        echo '🧪 Starting Test Environment...'
-        sh 'docker rm -f $CONTAINER_NAME || true'
-        sh 'docker rm -f $DB_CONTAINER || true'
-        sh 'docker-compose -f docker-compose.yml up -d --build'
+        echo "🧪 Running tests..."
+        sh 'npm install'
+        sh 'npm install --save-dev dotenv-cli'
+        sh 'npm test'
+      }
+    }
 
-        echo '🧪 Running Unit Tests...'
-        sh 'sleep 10' // Wait briefly for DB to initialize
-        sh 'docker exec $CONTAINER_NAME npm test || true'
+    stage('Code Quality (SonarQube)') {
+      steps {
+        echo "📊 Running SonarQube analysis..."
+        withSonarQubeEnv('My SonarQube') {
+          sh '''
+            npx sonar-scanner \
+              -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+              -Dsonar.sources=. \
+              -Dsonar.host.url=$SONAR_HOST_URL \
+              -Dsonar.login=$SONAR_TOKEN
+          '''
+        }
+      }
+    }
 
-        echo '🧹 Shutting down test containers...'
+    stage('Security Scan (Trivy)') {
+      steps {
+        echo "🔒 Scanning Docker image for vulnerabilities..."
+        sh 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image $IMAGE_NAME'
+      }
+    }
+
+    stage('Deploy (Docker Compose)') {
+      steps {
+        echo "🚀 Deploying with Docker Compose..."
         sh 'docker-compose down || true'
+        sh 'docker-compose up -d --build'
       }
     }
 
-    stage('Security Scan') {
+    stage('Monitoring Health Check') {
       steps {
-        echo '🔍 Running Trivy security scan...'
-        sh 'trivy image $IMAGE_NAME || true'
-      }
-    }
-
-    stage('Deploy') {
-      steps {
-        echo '🚀 Deploying app container...'
-        sh 'docker rm -f $CONTAINER_NAME || true'
-        sh '''
-          docker run -d --name $CONTAINER_NAME \
-          -p 3000:3000 \
-          -e DB_HOST=host.docker.internal \
-          -e DB_USER=root \
-          -e DB_PASSWORD=1234 \
-          -e DB_DATABASE=companydb \
-          -e PORT=3000 \
-          $IMAGE_NAME
-        '''
-      }
-    }
-
-    stage('Release') {
-      steps {
-        echo "🏷️ Tagging release: ${env.TAG}"
-        sh "git config user.email 'jenkins@local' && git config user.name 'jenkins'"
-        sh "git tag -a ${TAG} -m 'Release ${TAG}' || true"
-        sh "git push origin ${TAG} || true"
-      }
-    }
-
-    stage('Monitoring') {
-      steps {
-        echo '📋 Displaying last 10 log lines:'
-        sh 'docker logs $CONTAINER_NAME --tail 10 || true'
+        echo "📈 Checking app health..."
+        sh 'sleep 10'
+        sh 'curl --fail http://localhost:3000/ping || exit 1'
       }
     }
   }
 
   post {
-    failure {
-      echo '❌ Build failed. Cleaning up...'
+    always {
+      echo "🧹 Cleaning up..."
       sh 'docker-compose down || true'
     }
     success {
-      echo '✅ Build completed successfully.'
+      echo "✅ Pipeline completed successfully!"
+    }
+    failure {
+      echo "❌ Pipeline failed. Please check logs above."
     }
   }
 }
