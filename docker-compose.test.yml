@@ -19,7 +19,7 @@ services:
     env_file:
       - .env.test
     depends_on:
-      - db
+      - localhost
     command: ["sh", "./wait-for.sh"]
 
 volumes:
