@@ -4,31 +4,24 @@ services:
   db:
     image: mysql:5.7
     container_name: test-mysql
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: companydb
     ports:
-      - "3308:3306"
+      - "3308:3306"  # This is only for external use (Jenkins host can access)
     volumes:
       - test-mysql-data:/var/lib/mysql
 
   api:
     build:
       context: .
-      dockerfile: Dockerfile
     container_name: test-api
-    environment:
-      - NODE_ENV=test
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=root
-      - DB_DATABASE=companydb
-      - DB_PORT=3306
+    env_file:
+      - .env.test
     depends_on:
       - db
     command: >
-      sh -c "npx dotenv -e .env.test -- npm test"
+      sh -c "sleep 10 && npm test"
 
 volumes:
   test-mysql-data:
