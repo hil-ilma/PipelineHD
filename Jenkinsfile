@@ -18,12 +18,11 @@ pipeline {
 
     stage('Test') {
       steps {
-        echo "🧪 Running tests..."
-        sh 'docker run --rm node-api npm test'
-        sh 'npm install --save-dev dotenv-cli'
-        sh 'npm test'
+        echo '🧪 Running tests with Docker Compose...'
+        sh 'docker-compose -f docker-compose.test.yml up --abort-on-container-exit --build --exit-code-from api'
       }
     }
+
 
     stage('Code Quality (SonarQube)') {
       steps {
