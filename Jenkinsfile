@@ -19,7 +19,7 @@ pipeline {
     stage('Test') {
       steps {
         echo "🧪 Running tests..."
-        sh 'npm install'
+        sh 'docker run --rm node-api npm test'
         sh 'npm install --save-dev dotenv-cli'
         sh 'npm test'
       }
