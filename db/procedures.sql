@@ -1,7 +1,6 @@
 USE company;
 
 DELIMITER $$
-USE `company`$$
 
 CREATE PROCEDURE `employeeAddOrEdit` (
   IN _id INT,
