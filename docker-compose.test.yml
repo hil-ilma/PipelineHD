@@ -19,8 +19,7 @@ services:
     env_file:
       - .env.test
     depends_on:
-      - localhost
+      - db
     command: ["sh", "./wait-for.sh"]
 
-volumes:
-  test-mysql-data:
+
