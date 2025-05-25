@@ -10,8 +10,8 @@ services:
     ports:
       - "3308:3306"
     volumes:
-      - ./db/database.sql:/docker-entrypoint-initdb.d/1-database.sql
-      - ./db/procedures.sql:/docker-entrypoint-initdb.d/2-procedures.sql
+      - ./db:/docker-entrypoint-initdb.d
+      - test-mysql-data:/var/lib/mysql
 
   api:
     build:
