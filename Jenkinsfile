@@ -49,7 +49,7 @@ stage('Monitoring') {
       sh 'sleep 5' // give app time to boot
       sh 'docker ps -a'
 sh 'docker logs node-api || true'
-      def health = sh(script: "docker exec node-api curl --fail http://localhost:3000/health || echo 'fail'", returnStdout: true).trim()
+      def health = sh(script: "docker exec node-api wget -qO- http://localhost:3000/health || echo 'fail'", returnStdout: true).trim()
       if (health == 'fail') {
         echo "❌ Health endpoint not available"
       } else {
@@ -81,7 +81,7 @@ sh 'docker logs node-api || true'
   always {
     echo '📊 Running health checks...'
     sh 'sleep 5'
-    sh 'docker exec node-api curl --fail http://localhost:3000/health || echo "❌ Health check failed inside container"'
+    sh 'docker exec node-api wget -qO- http://localhost:3000/health || echo "❌ Health check failed inside container"'
   }
 }
 
