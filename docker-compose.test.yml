@@ -17,8 +17,7 @@ services:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      - test-mysql:
-          condition: service_healthy
+      - test-mysql
     networks:
       - testnet
     entrypoint: ["sh", "-c", "sleep 10 && npm run test:ci"]
