@@ -26,3 +26,12 @@ services:
 
 networks:
   testnet:
+
+sonarqube:
+  image: sonarqube:lts
+  ports:
+    - "9000:9000"
+  environment:
+    - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+  networks:
+    - testnet
