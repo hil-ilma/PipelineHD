@@ -16,12 +16,14 @@ pipeline {
       }
     }
 
-    stage('Test') {
-      steps {
-        echo "🧪 Running stateless tests inside Docker..."
-        sh 'docker-compose -f docker-compose.test.yml up --abort-on-container-exit --build --exit-code-from api'
-      }
+  stage('Test') {
+    steps {
+      echo "🧪 Running stateless tests inside Docker..."
+      sh 'docker-compose -f docker-compose.test.yml down --remove-orphans || true'
+      sh 'docker-compose -f docker-compose.test.yml up --abort-on-container-exit --build --exit-code-from api'
     }
+  }
+
 
     stage('Security Scan (Trivy)') {
       steps {
@@ -34,16 +36,20 @@ pipeline {
       steps {
         echo '🚀 Deploying with Docker Compose...'
         sh 'docker rm -f mysql-db || true'
-        sh 'docker-compose down'
+        sh 'docker rm -f node-api || true'  // 🔧 Add this line
+        sh 'docker-compose down --remove-orphans'
         sh 'docker-compose up -d --build'
       }
     }
+
   }
 
   post {
-    always {
-      echo '📊 Running health checks...'
-      sh 'curl --fail http://localhost:3000/health || echo "❌ Health check failed"'
-    }
+  always {
+    echo '📊 Running health checks...'
+    sh 'sleep 5'
+    sh 'curl --fail http://localhost:3000/health || echo "❌ Health check failed"'
   }
+}
+
 }
