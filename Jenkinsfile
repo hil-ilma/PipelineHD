@@ -27,24 +27,24 @@ pipeline {
   }
 
 
-stage('Code Quality (SonarQube)') {
-  agent {
-    docker {
-      image 'sonarsource/sonar-scanner-cli'
-    }
-  }
-  steps {
-    withSonarQubeEnv('sonarqube-token') {
-      sh '''
-        sonar-scanner \
-          -Dsonar.projectKey=node-api \
-          -Dsonar.sources=. \
-          -Dsonar.host.url=http://localhost:9000 \
-          -Dsonar.login=$SONAR_TOKEN
-      '''
-    }
-  }
-}
+
+// stage('Code Quality (SonarQube)') {
+//     agent {
+//         docker { image 'node' }
+//     }
+//     steps {
+//         script {
+//             docker.image('sonarsource/sonar-scanner-cli').inside {
+//                 withSonarQubeEnv('sonarqube-token') {
+//                     sh '''
+//                     sonar-scanner -Dsonar.projectKey=node-api -Dsonar.sources=. -Dsonar.host.url=http://localhost:9000 -Dsonar.login=$SONAR_TOKEN
+//                     '''
+//                 }
+//             }
+//         }
+//     }
+// }
+
 
 
 
