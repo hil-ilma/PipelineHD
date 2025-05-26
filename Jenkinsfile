@@ -4,7 +4,7 @@ pipeline {
   environment {
     IMAGE_NAME = "node-api"
     SONAR_PROJECT_KEY = "node-api"
-    SONAR_HOST_URL = "http://localhost:9000"
+    SONAR_HOST_URL = "http://172.17.0.1:9000"
     SONAR_TOKEN = credentials('sonarqube-token')
   }
 
@@ -34,7 +34,7 @@ pipeline {
               sonarsource/sonar-scanner-cli \
               -Dsonar.projectKey=$SONAR_PROJECT_KEY \
               -Dsonar.sources=. \
-              -Dsonar.host.url="http://172.17.0.1:9000" \
+              -Dsonar.host.url=$SONAR_HOST_URL \
               -Dsonar.login=$SONAR_TOKEN
           '''
         }
@@ -94,7 +94,7 @@ pipeline {
     always {
       echo ' Running health checks...'
       sh 'sleep 5'
-      sh 'docker exec node-api wget -qO- http://localhost:3000/health || echo "❌ Health check failed inside container"'
+      sh 'docker exec node-api wget -qO- http://172.17.0.1:3000/health || echo "❌ Health check failed inside container"'
     }
   }
 }
