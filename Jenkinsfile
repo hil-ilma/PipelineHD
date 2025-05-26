@@ -33,20 +33,22 @@ pipeline {
     }
 
     stage('Deploy (Docker Compose)') {
-      steps {
-        echo '🚀 Deploying with Docker Compose...'
-        sh 'docker rm -f mysql-db || true'
-        sh 'docker rm -f node-api || true'  // 🔧 Add this line
-        sh 'docker-compose down --remove-orphans'
-        sh 'docker-compose up -d --build'
-      }
-    }
+  steps {
+    echo '🚀 Deploying with Docker Compose...'
+    sh 'docker rm -f node-api mysql-db || true'
+    sh 'docker-compose down --remove-orphans'
+    sh 'docker-compose up -d --build'
+  }
+}
+
 
 stage('Monitoring') {
   steps {
     echo '📈 Simulating Monitoring (Health & Logs)...'
     script {
       sh 'sleep 5' // give app time to boot
+      sh 'docker ps -a'
+sh 'docker logs node-api || true'
       def health = sh(script: "curl --fail http://localhost:3000/health || echo 'fail'", returnStdout: true).trim()
       if (health == 'fail') {
         echo "❌ Health endpoint not available"
@@ -59,9 +61,7 @@ stage('Monitoring') {
 
 
     stage('Release') {
-  when {
-    branch 'master'
-  }
+  
   steps {
     echo '🏷️ Creating Release Tag and Preparing Artifact...'
     sh """

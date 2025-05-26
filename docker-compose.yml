@@ -15,7 +15,9 @@ services:
       - ./db/procedures.sql:/docker-entrypoint-initdb.d/2.sql
 
   node-app:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: node-api
     depends_on:
       - mysql
