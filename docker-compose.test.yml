@@ -1,30 +1,9 @@
 ---
-# ✅ Final docker-compose.test.yml for Jenkins pipeline using `.env.jenkins`
 version: '3.8'
 
 services:
-  test-mysql:
-    image: mysql:8
-    container_name: test-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: companydb
-    volumes:
-      - ./db/database.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - testnet
-
   api:
     build:
       context: .
       dockerfile: Dockerfile
-    depends_on:
-      - test-mysql
-    env_file:
-      - .env.jenkins
-    command: ["./wait-for.sh", "test-mysql:3306", "--", "npm", "test"]
-    networks:
-      - testnet
-
-networks:
-  testnet:
+    command: ["npm", "run", "test:ci"]

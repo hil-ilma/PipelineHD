@@ -18,10 +18,11 @@ pipeline {
 
   stage('Test') {
     steps {
-      echo '🧪 Running tests with Docker Compose...'
-      sh 'npm run test:ci'
+      echo "🧪 Running stateless tests inside Docker..."
+      sh 'docker-compose -f docker-compose.test.yml up --abort-on-container-exit --build --exit-code-from api'
     }
   }
+
 
 
 
