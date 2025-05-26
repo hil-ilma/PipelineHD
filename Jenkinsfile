@@ -27,20 +27,26 @@ pipeline {
   }
 
 
-    stage('Code Quality (SonarQube)') {
-      steps {
-        echo "📊 Running SonarQube analysis..."
-        withSonarQubeEnv('sonarqube-token') {
-          sh '''
-            npx sonar-scanner \
-              -Dsonar.projectKey=$SONAR_PROJECT_KEY \
-              -Dsonar.sources=. \
-              -Dsonar.host.url=$SONAR_HOST_URL \
-              -Dsonar.login=$SONAR_TOKEN
-          '''
-        }
+stage('Code Quality (SonarQube)') {
+  agent {
+    docker {
+      image 'node:18'
+    }
+  }
+    steps {
+      withSonarQubeEnv('sonarqube-token') {
+        sh '''
+          npm install -g sonar-scanner
+          sonar-scanner \
+            -Dsonar.projectKey=node-api \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=http://localhost:9000 \
+            -Dsonar.login=$SONAR_TOKEN
+        '''
       }
     }
+  }
+
 
     stage('Security Scan (Trivy)') {
       steps {
