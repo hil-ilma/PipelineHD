@@ -19,10 +19,7 @@ pipeline {
   stage('Test') {
     steps {
       echo '🧪 Running tests with Docker Compose...'
-      sh '''
-        docker-compose -f docker-compose.test.yml down --remove-orphans || true
-        docker-compose -f docker-compose.test.yml up --abort-on-container-exit --build --exit-code-from api
-      '''
+      sh sh 'npm run test:ci'
     }
   }
 
