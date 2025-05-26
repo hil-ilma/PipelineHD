@@ -3,19 +3,22 @@ services:
     image: mysql:8.0
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: testdb
     ports:
       - "3307:3306"
-    volumes:
-      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-    networks:
-      - testnet
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      retries: 10
+
 
   api:
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      - test-mysql
+      - test-mysql:
+          condition: service_healthy
     networks:
       - testnet
     entrypoint: ["sh", "-c", "sleep 10 && npm run test:ci"]
