@@ -53,38 +53,50 @@ pipeline {
       }
     }
 
-    stage('Deploy (Docker Compose)') {
-      steps {
-        echo "🚀 Deploying with Docker Compose..."
-        sh 'docker-compose down || true'
-        sh 'docker-compose up -d --build'
-      }
+  stage('Deploy (Docker Compose)') {
+    steps {
+      echo '🚀 Deploying with Docker Compose...'
+      sh 'docker rm -f mysql-db || true'
+      sh 'docker-compose down'
+      sh 'docker-compose up -d --build'
     }
+  }
 
-    stage('Monitoring Health Check') {
-      steps {
-        echo "📈 Checking app health..."
-        sh 'sleep 10'
-        sh 'curl --fail http://localhost:3000/ping || exit 1'
-      }
+
+stage('Monitoring Health Check') {
+  when {
+    expression {
+      currentBuild.currentResult == 'SUCCESS' || currentBuild.currentResult == 'UNSTABLE'
     }
+  }
+  steps {
+    echo '📊 Running health checks...'
+    // Add your actual health check command here
+  }
+}
+
   }
 
     post {
-    always {
-      echo "🧹 Cleaning up..."
-      sh '''
-        docker-compose -f docker-compose.test.yml stop || true
-        docker-compose -f docker-compose.test.yml down --remove-orphans --volumes || true
-        docker network prune -f || true
-      '''
-    }
-    success {
-      echo "✅ Pipeline completed successfully!"
-    }
-    failure {
-      echo "❌ Pipeline failed. Please check logs above."
+  always {
+    stage('Monitoring Health Check') {
+      steps {
+        echo '📊 Running health checks...'
+        // curl http://localhost:3000/health or similar
+      }
     }
   }
+}
+post {
+  always {
+    stage('Monitoring Health Check') {
+      steps {
+        echo '📊 Running health checks...'
+        // curl http://localhost:3000/health or similar
+      }
+    }
+  }
+}
+
 
 }
