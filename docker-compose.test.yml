@@ -9,9 +9,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: companydb
     volumes:
-      - ./db/database.sql:/docker-entrypoint-initdb.d/1_database.sql
-      - ./db/procedures.sql:/docker-entrypoint-initdb.d/2_procedures.sql
- 
+     - ./db:/docker-entrypoint-initdb.d
+
 
   api:
     build:
