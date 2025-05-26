@@ -15,24 +15,22 @@ pipeline {
         sh 'docker build -t $IMAGE_NAME -f Dockerfile .'
       }
     }
-stage('Test') {
-  steps {
-    echo '🧪 Running tests with Docker Compose...'
-    sh '''
-      docker-compose -f docker-compose.test.yml down --remove-orphans || true
-      docker rm -f test-mysql || true
-      docker network rm pipelinetaskhd_default || true
-      docker-compose -f docker-compose.test.yml up -d test-mysql
-      sleep 10
-      docker-compose -f docker-compose.test.yml run --rm api sh -c "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules dotenv -e .env.jenkins -- jest --coverage"
-      docker-compose -f docker-compose.test.yml down --remove-orphans || true
-    '''
-  }
-}
 
+    stage('Test') {
+      steps {
+        echo '🧪 Running tests with Docker Compose...'
+        sh '''
+          docker-compose -f docker-compose.test.yml down --remove-orphans || true
+          docker rm -f test-mysql || true
+          docker network rm pipelinetaskhd_default || true
 
+          docker-compose -f docker-compose.test.yml up -d test-mysql
+          sleep 10
 
-
+          docker-compose -f docker-compose.test.yml run --rm api sh -c "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules dotenv -e .env.jenkins -- jest --coverage"
+        '''
+      }
+    }
 
     stage('Code Quality (SonarQube)') {
       steps {
@@ -76,7 +74,11 @@ stage('Test') {
   post {
     always {
       echo "🧹 Cleaning up..."
-      sh 'docker-compose down || true'
+      sh '''
+        docker-compose -f docker-compose.test.yml stop || true
+        docker-compose -f docker-compose.test.yml down --remove-orphans --volumes || true
+        docker network prune -f || true
+      '''
     }
     success {
       echo "✅ Pipeline completed successfully!"
