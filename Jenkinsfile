@@ -43,6 +43,35 @@ pipeline {
     }
 
   }
+stage('Monitoring') {
+  steps {
+    echo '📈 Simulating Monitoring (Health & Logs)...'
+    script {
+      sh 'sleep 5' // give app time to boot
+      def health = sh(script: "curl --fail http://localhost:3000/health || echo 'fail'", returnStdout: true).trim()
+      if (health == 'fail') {
+        echo "❌ Health endpoint not available"
+      } else {
+        echo "✅ Health check passed"
+      }
+    }
+  }
+}
+stage('Release') {
+  when {
+    branch 'master'
+  }
+  steps {
+    echo '🏷️ Creating Release Tag and Preparing Artifact...'
+    sh """
+      git config user.email "ci@pipeline.com"
+      git config user.name "Jenkins CI"
+      git tag -a v1.0.${BUILD_NUMBER} -m "Release v1.0.${BUILD_NUMBER}"
+      git push origin v1.0.${BUILD_NUMBER}
+    """
+    echo '📦 Build artifact tagged successfully.'
+  }
+}
 
   post {
   always {
