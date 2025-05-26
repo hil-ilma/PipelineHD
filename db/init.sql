@@ -2,18 +2,12 @@ CREATE DATABASE IF NOT EXISTS companydb;
 
 USE companydb;
 
-CREATE TABLE employee (
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  name VARCHAR(45) DEFAULT NULL,
-  salary INT(11) DEFAULT NULL, 
-  PRIMARY KEY(id)
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    email VARCHAR(100)
 );
 
-DESCRIBE employee;
-
-INSERT INTO employee values 
-  (1, 'Ryan Ray', 20000),
-  (2, 'Joe McMillan', 40000),
-  (3, 'John Carter', 50000);
-
-
+INSERT INTO users (name, email) VALUES
+('Hilma', 'hilma@example.com'),
+('Admin', 'admin@example.com');
