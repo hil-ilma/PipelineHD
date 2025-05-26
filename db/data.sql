@@ -1,0 +1,8 @@
+CREATE DATABASE IF NOT EXISTS companydb;
+USE companydb;
+
+CREATE TABLE IF NOT EXISTS employee (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(45),
+  salary INT
+);
