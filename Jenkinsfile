@@ -1,7 +1,10 @@
 pipeline {
-    agent {
+  agent {
     docker {
-   image 'node:18'
+      image 'node:18'
+    }
+  }
+
   environment {
     IMAGE_NAME = "node-api"
     SONAR_PROJECT_KEY = "node-api"
@@ -17,16 +20,15 @@ pipeline {
       }
     }
 
-  stage('Test') {
-    steps {
-      echo '🧪 Running tests with Docker Compose...'
-      sh '''
-        docker-compose -f docker-compose.test.yml down --remove-orphans || true
-        docker-compose -f docker-compose.test.yml up --abort-on-container-exit --build --exit-code-from api
-      '''
+    stage('Test') {
+      steps {
+        echo '🧪 Running tests with Docker Compose...'
+        sh '''
+          docker-compose -f docker-compose.test.yml down --remove-orphans || true
+          docker-compose -f docker-compose.test.yml up --abort-on-container-exit --build --exit-code-from api
+        '''
+      }
     }
-  }
-
 
     stage('Code Quality (SonarQube)') {
       steps {
@@ -67,7 +69,7 @@ pipeline {
     }
   }
 
-    post {
+  post {
     always {
       echo "🧹 Cleaning up..."
       sh '''
@@ -83,6 +85,4 @@ pipeline {
       echo "❌ Pipeline failed. Please check logs above."
     }
   }
-
-}}
 }
