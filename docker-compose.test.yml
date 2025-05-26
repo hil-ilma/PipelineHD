@@ -1,20 +1,31 @@
+version: '3.8'
+
 services:
-  db:
+  test-mysql:
     image: mysql:5.7
     container_name: test-mysql
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: companydb
     ports:
-      - "3308:3306"
+      - "3307:3306"
     volumes:
       - ./db/database.sql:/docker-entrypoint-initdb.d/database.sql
+      - ./db/procedures.sql:/docker-entrypoint-initdb.d/procedures.sql
+
   api:
-    build:
-      context: .
+    build: .
     container_name: test-api
+    command: ["sh", "./wait-for.sh"]
     depends_on:
       - test-mysql
-    env_file:
-      - .env.test
-    command: ["sh", "./wait-for.sh"]
+    environment:
+      DB_HOST: test-mysql
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_DATABASE: companydb
+      DB_PORT: 3306
+      PORT: 3000
+    ports:
+      - "3000:3000"
