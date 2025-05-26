@@ -39,7 +39,7 @@ stage('Code Quality (SonarQube)') {
         sonar-scanner \
           -Dsonar.projectKey=node-api \
           -Dsonar.sources=. \
-          -Dsonar.host.url=http://sonarqube:9000 \
+          -Dsonar.host.url=http://localhost:9000 \
           -Dsonar.login=$SONAR_TOKEN
       '''
     }
