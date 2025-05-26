@@ -1,9 +1,11 @@
+version: "3.8"
+
 services:
   test-mysql:
     image: mysql:8.0
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      MYSQL_DATABASE: testdb
+      MYSQL_DATABASE: companydb
     ports:
       - "3307:3306"
     healthcheck:
@@ -11,13 +13,12 @@ services:
       interval: 5s
       retries: 10
 
-
   api:
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      - test-mysql
+      - test-mysql  
     networks:
       - testnet
     entrypoint: ["./wait-for.sh", "test-mysql", "3306", "npm", "run", "test:ci"]
