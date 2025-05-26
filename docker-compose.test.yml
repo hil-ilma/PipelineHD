@@ -11,8 +11,7 @@ services:
     volumes:
       - ./db/database.sql:/docker-entrypoint-initdb.d/1_database.sql
       - ./db/procedures.sql:/docker-entrypoint-initdb.d/2_procedures.sql
-    ports:
-      - "3308:3306" # or whatever you’re using
+ 
 
   api:
     build:

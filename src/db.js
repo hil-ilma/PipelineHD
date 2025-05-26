@@ -14,3 +14,5 @@ export const pool = createPool({
   port: DB_PORT,
   database: DB_DATABASE,
 });
+
+console.log('Connecting to DB at', process.env.DB_HOST, process.env.DB_PORT);
