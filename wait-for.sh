@@ -1,20 +1,20 @@
 #!/bin/sh
 
-HOST="$1"
-PORT="$2"
+# wait-for.sh host:port -- command
+# Example: ./wait-for.sh test-mysql:3306 -- npm test
 
-echo "⏳ Waiting for $HOST:$PORT to be ready..."
+HOSTPORT=$1
+shift
+CMD="$@"
+
+HOST=$(echo "$HOSTPORT" | cut -d: -f1)
+PORT=$(echo "$HOSTPORT" | cut -d: -f2)
+
+echo "⏳ Waiting for $HOST:$PORT to be available..."
 
 while ! nc -z "$HOST" "$PORT"; do
   sleep 1
 done
 
-# Additional check: wait for MySQL init
-echo "⏳ Waiting for MySQL server to respond to ping..."
-
-until mysqladmin ping -h "$HOST" --silent; do
-  sleep 1
-done
-
-echo "✅ $HOST:$PORT is ready!"
-exec "${@:3}"
+echo "✅ $HOST:$PORT is available. Running command..."
+exec $CMD
