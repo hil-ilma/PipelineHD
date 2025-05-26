@@ -1,7 +1,7 @@
 FROM node:18-alpine
 
 # Install netcat so we can use nc in wait-for.sh
-RUN apk add --no-cache netcat-openbsd
+RUN apk add --no-cache netcat-openbsd mysql-client
 
 WORKDIR /app
 

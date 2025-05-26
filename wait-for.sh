@@ -1,17 +1,20 @@
 #!/bin/sh
-host="$1"
-shift
 
-echo "⏳ Waiting for $host to be ready..."
-until nc -z $host 3306; do
+HOST="$1"
+PORT="$2"
+
+echo "⏳ Waiting for $HOST:$PORT to be ready..."
+
+while ! nc -z "$HOST" "$PORT"; do
   sleep 1
 done
 
 # Additional check: wait for MySQL init
-echo "⏳ Waiting for MySQL to accept connections..."
-until mysqladmin ping -h "$host" --silent; do
+echo "⏳ Waiting for MySQL server to respond to ping..."
+
+until mysqladmin ping -h "$HOST" --silent; do
   sleep 1
 done
 
-echo "✅ $host is up!"
-exec "$@"
+echo "✅ $HOST:$PORT is ready!"
+exec "${@:3}"
