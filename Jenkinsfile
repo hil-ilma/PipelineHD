@@ -16,14 +16,24 @@ pipeline {
       }
     }
 
-  stage('Test') {
-    steps {
-      echo '🧪 Running tests with Docker Compose...'
-      sh 'docker-compose -f docker-compose.test.yml down --remove-orphans || true'
-      sh 'docker rm -f test-mysql || true'
-      sh 'docker-compose -f docker-compose.test.yml up --abort-on-container-exit --build --force-recreate --exit-code-from api'
-    }
+stage('Test') {
+  steps {
+    echo '🧪 Running tests with Docker Compose...'
+    sh '''
+      docker-compose -f docker-compose.test.yml down --remove-orphans || true
+      docker rm -f test-mysql || true
+
+      # Start MySQL first (in detached mode)
+      docker-compose -f docker-compose.test.yml up -d test-mysql
+      sleep 10  # Wait for MySQL to be ready
+
+      # Run the test command in api container using .env.jenkins
+      docker-compose -f docker-compose.test.yml run --rm api \
+        sh -c "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules dotenv -e .env.jenkins -- jest --coverage"
+    '''
   }
+}
+
 
 
 
