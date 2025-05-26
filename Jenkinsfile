@@ -1,6 +1,7 @@
 pipeline {
-  agent any
-
+    agent {
+    docker {
+   image 'node:18'
   environment {
     IMAGE_NAME = "node-api"
     SONAR_PROJECT_KEY = "node-api"
@@ -83,4 +84,5 @@ pipeline {
     }
   }
 
+}
 }

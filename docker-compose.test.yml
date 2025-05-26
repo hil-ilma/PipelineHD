@@ -9,10 +9,12 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: companydb
-    volumes:
-      - ./sql/database.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - testnet
+  volumes:
+    - ./db/database.sql:/docker-entrypoint-initdb.d/1_database.sql
+    - ./db/procedures.sql:/docker-entrypoint-initdb.d/2_procedures.sql
+
+  networks:
+        - testnet
 
   api:
     build:
