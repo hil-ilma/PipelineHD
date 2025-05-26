@@ -61,18 +61,20 @@ sh 'docker logs node-api || true'
 
 
     stage('Release') {
-  
-  steps {
-    echo '🏷️ Creating Release Tag and Preparing Artifact...'
-    sh """
-      git config user.email "ci@pipeline.com"
-      git config user.name "Jenkins CI"
-      git tag -a v1.0.${BUILD_NUMBER} -m "Release v1.0.${BUILD_NUMBER}"
-      git push origin v1.0.${BUILD_NUMBER}
-    """
-    echo '📦 Build artifact tagged successfully.'
-  }
-}
+      steps {
+        echo '🏷️ Creating Release Tag and Pushing to GitHub...'
+        withCredentials([usernamePassword(credentialsId: 'github-pat', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+          sh '''
+            git config user.email "ci@pipeline.com"
+            git config user.name "Jenkins CI"
+            git tag -a v1.0.${BUILD_NUMBER} -m "Release v1.0.${BUILD_NUMBER}"
+            git remote set-url origin https://${GIT_USER}:${GIT_TOKEN}@github.com/hil-ilma/PipelineHD.git
+            git push origin v1.0.${BUILD_NUMBER}
+          '''
+        }
+      }
+    }
+
 
 
   }
