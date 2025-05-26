@@ -1,14 +1,12 @@
 services:
   test-mysql:
-    image: mysql:8
-    container_name: test-mysql
-    # No need to expose any ports for test
-    # Just use internal Docker networking
+    image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: companydb
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    ports:
+      - "3307:3306"
     volumes:
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     networks:
       - testnet
 
