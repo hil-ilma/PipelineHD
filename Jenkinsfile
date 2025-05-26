@@ -30,22 +30,22 @@ pipeline {
 stage('Code Quality (SonarQube)') {
   agent {
     docker {
-      image 'node:18'
+      image 'sonarsource/sonar-scanner-cli'
     }
   }
-    steps {
-      withSonarQubeEnv('sonarqube-token') {
-        sh '''
-          npm install -g sonar-scanner
-          sonar-scanner \
-            -Dsonar.projectKey=node-api \
-            -Dsonar.sources=. \
-            -Dsonar.host.url=http://localhost:9000 \
-            -Dsonar.login=$SONAR_TOKEN
-        '''
-      }
+  steps {
+    withSonarQubeEnv('sonarqube-token') {
+      sh '''
+        sonar-scanner \
+          -Dsonar.projectKey=node-api \
+          -Dsonar.sources=. \
+          -Dsonar.host.url=http://localhost:9000 \
+          -Dsonar.login=$SONAR_TOKEN
+      '''
     }
   }
+}
+
 
 
     stage('Security Scan (Trivy)') {
