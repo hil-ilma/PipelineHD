@@ -23,7 +23,7 @@ pipeline {
         sh 'docker-compose -f docker-compose.test.yml up --abort-on-container-exit --build --exit-code-from api'
       }
     }
-    
+
     stage('Code Quality (SonarQube)') {
       steps {
         echo "🧠 Running SonarQube Analysis..."
@@ -34,7 +34,7 @@ pipeline {
               sonarsource/sonar-scanner-cli \
               -Dsonar.projectKey=$SONAR_PROJECT_KEY \
               -Dsonar.sources=. \
-              -Dsonar.host.url=$SONAR_HOST_URL \
+              -Dsonar.host.url="http://172.17.0.1:9000" \
               -Dsonar.login=$SONAR_TOKEN
           '''
         }
