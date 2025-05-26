@@ -16,6 +16,14 @@ pipeline {
       }
     }
 
+    stage('Test') {
+      steps {
+        echo "🧪 Running stateless tests inside Docker..."
+        sh 'docker-compose -f docker-compose.test.yml down --remove-orphans || true'
+        sh 'docker-compose -f docker-compose.test.yml up --abort-on-container-exit --build --exit-code-from api'
+      }
+    }
+    
     stage('Code Quality (SonarQube)') {
       steps {
         echo "🧠 Running SonarQube Analysis..."
@@ -30,14 +38,6 @@ pipeline {
               -Dsonar.login=$SONAR_TOKEN
           '''
         }
-      }
-
-
-    stage('Test') {
-      steps {
-        echo "🧪 Running stateless tests inside Docker..."
-        sh 'docker-compose -f docker-compose.test.yml down --remove-orphans || true'
-        sh 'docker-compose -f docker-compose.test.yml up --abort-on-container-exit --build --exit-code-from api'
       }
     }
 
@@ -75,7 +75,6 @@ pipeline {
     }
 
     stage('Release') {
-     
       steps {
         echo '🏷️ Creating Release Tag and Pushing to GitHub...'
         withCredentials([usernamePassword(credentialsId: 'github-pat', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
