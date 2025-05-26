@@ -58,9 +58,7 @@ pipeline {
     }
 
     stage('Release') {
-      when {
-        branch 'master'
-      }
+     
       steps {
         echo '🏷️ Creating Release Tag and Pushing to GitHub...'
         withCredentials([usernamePassword(credentialsId: 'github-pat', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
