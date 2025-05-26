@@ -6,7 +6,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: companydb
     ports:
-      - "3307:3306"
+      - "3308:3306"
     volumes:
       - ./db:/docker-entrypoint-initdb.d
 
