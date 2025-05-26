@@ -94,7 +94,7 @@ pipeline {
     always {
       echo ' Running health checks...'
       sh 'sleep 5'
-      sh 'docker exec node-api wget -qO- http://172.17.0.1:3000/health || echo "❌ Health check failed inside container"'
+      sh 'docker exec node-api curl -s http://172.17.0.1:3000/health || echo " Health check failed inside container"'
     }
   }
 }
