@@ -30,7 +30,7 @@ pipeline {
     stage('Code Quality (SonarQube)') {
       steps {
         echo "📊 Running SonarQube analysis..."
-        withSonarQubeEnv('My SonarQube') {
+        withSonarQubeEnv('sonarqube-token') {
           sh '''
             npx sonar-scanner \
               -Dsonar.projectKey=$SONAR_PROJECT_KEY \
