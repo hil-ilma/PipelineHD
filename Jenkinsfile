@@ -34,12 +34,10 @@ pipeline {
       steps {
         echo '🚀 Deploying with Docker Compose...'
         sh 'docker rm -f mysql-db || true'
-        sh 'docker rm -f node-api || true'  // 🔧 Add this line
-        sh 'docker-compose down --remove-orphans'
+        sh 'docker-compose down'
         sh 'docker-compose up -d --build'
       }
     }
-
   }
 
   post {
