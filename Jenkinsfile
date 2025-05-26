@@ -19,7 +19,7 @@ pipeline {
   stage('Test') {
     steps {
       echo '🧪 Running tests with Docker Compose...'
-      sh sh 'npm run test:ci'
+      sh 'npm run test:ci'
     }
   }
 
