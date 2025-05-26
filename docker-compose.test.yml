@@ -2,30 +2,27 @@ version: '3.8'
 
 services:
   test-mysql:
-    image: mysql:5.7
+    image: mysql:8
     container_name: test-mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: testpass
-      MYSQL_DATABASE: companydb
     ports:
-      - "3310:3306"
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: companydb
     volumes:
-      - ./db/database.sql:/docker-entrypoint-initdb.d/database.sql
-      - ./db/procedures.sql:/docker-entrypoint-initdb.d/procedures.sql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - testnet
 
   api:
-    build: .
-    container_name: test-api
-    command: ["sh", "./wait-for.sh"]
+    build:
+      context: .
+      dockerfile: Dockerfile
     depends_on:
       - test-mysql
-    environment:
-      DB_HOST: test-mysql
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_DATABASE: companydb
-      DB_PORT: 3306
-      PORT: 3000
-    ports:
-      - "3000:3000"
+    networks:
+      - testnet
+    entrypoint: ["sh", "-c", "sleep 10 && npm run test:ci"]
+
+networks:
+  testnet:
