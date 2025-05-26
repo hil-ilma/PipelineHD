@@ -16,6 +16,23 @@ pipeline {
       }
     }
 
+    stage('Code Quality (SonarQube)') {
+      steps {
+        echo "🧠 Running SonarQube Analysis..."
+        withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN')]) {
+          sh '''
+            docker run --rm \
+              -v "$(pwd):/usr/src" \
+              sonarsource/sonar-scanner-cli \
+              -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+              -Dsonar.sources=. \
+              -Dsonar.host.url=$SONAR_HOST_URL \
+              -Dsonar.login=$SONAR_TOKEN
+          '''
+        }
+      }
+
+
     stage('Test') {
       steps {
         echo "🧪 Running stateless tests inside Docker..."
