@@ -42,7 +42,6 @@ pipeline {
       }
     }
 
-  }
 stage('Monitoring') {
   steps {
     echo '📈 Simulating Monitoring (Health & Logs)...'
@@ -57,7 +56,9 @@ stage('Monitoring') {
     }
   }
 }
-stage('Release') {
+
+
+    stage('Release') {
   when {
     branch 'master'
   }
@@ -72,6 +73,9 @@ stage('Release') {
     echo '📦 Build artifact tagged successfully.'
   }
 }
+
+
+  }
 
   post {
   always {
