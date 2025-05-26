@@ -9,7 +9,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: companydb
-    # No ports: to avoid port conflict on Jenkins host
+    volumes:
+      - ./db/database.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - testnet
 
